@@ -56,6 +56,28 @@ The domains are used for assigning boundary conditions by tagging cells of the m
 
 The info file is used to specify the boundary conditions. The domains deffined on the volume mesh are used here as the ID to identify where to perscribe the boundary conditions. The info file in this repository has a description of what each element does.
 
+# the .sh file
+
+This file is what will actually start the computation and use up our scinet allocation. Inside of the file several variables are deffined, these are.
+
+- casename="p314_edited_cl_pr"
+	- The name you want all generated casefiles to have
+- cycles=2
+	- How many cardiac cycles to run
+- timesteps_per_cycle=9600
+	- How many timesteps per cardiac cycle
+- uOrder=1
+	- The order of the velocity interpolation
+- save_frequency=10
+	- How many timesteps per data write
+- estimated_required_time="24:00:00"
+	- The time you anticipate the job will run for on scinet
+- post_processing_time_minutes=180
+	- Time you wait after job has been completed with job still in the que to generate indicies such as TAWSS or OSI
+- num_cores=80
+	- How many cores of the node you get you will use
+	- NOTE!!!!!: Each node only has 40 real cores, using 80 enables hyperthreadding
+
 # Running a job on scinet
 
 all you have to to to run this sample job on scinet is run the following commands from a logged in terminal:
