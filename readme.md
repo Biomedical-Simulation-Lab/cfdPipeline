@@ -62,7 +62,7 @@ all you have to to to run this sample job on scinet is run the following command
 
 `cd $SCRATCH`
 
-`git clone git@gitlab.com:ramen_newdals/oldCFDPipeline.git`
+`git clone https://gitlab.com/ramen_newdals/oldCFDPipeline.git`
 
 `cd oldCFDPipeline`
 
