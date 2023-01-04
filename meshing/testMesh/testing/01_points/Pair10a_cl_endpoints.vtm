@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<VTKFile type="vtkMultiBlockDataSet" version="1.0" byte_order="LittleEndian" header_type="UInt32" compressor="vtkZLibDataCompressor">
+  <vtkMultiBlockDataSet>
+    <DataSet index="0" name="inlets" file="Pair10a_cl_endpoints/Pair10a_cl_endpoints_0.vtp"/>
+    <DataSet index="1" name="outlets" file="Pair10a_cl_endpoints/Pair10a_cl_endpoints_1.vtp"/>
+    <DataSet index="2" name="aneurysms" file="Pair10a_cl_endpoints/Pair10a_cl_endpoints_2.vtp"/>
+  </vtkMultiBlockDataSet>
+</VTKFile>
