@@ -4,8 +4,8 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=20
 #SBATCH --time=01:00:00
-#SBATCH --job-name spec_
-#SBATCH --output=spec_%j.txt
+#SBATCH --job-name vol_
+#SBATCH --output=vol_%j.txt
 #SBATCH --mail-type=FAIL
 
 export OMP_NUM_THREADS=4
@@ -28,16 +28,15 @@ MAIN_DIR="/scratch/s/steinman/macdo708/neuromorph_analysis"
 PROJ_FOLDER="/scratch/s/steinman/macdo708/neuromorph_analysis/$SEQ"
 RESULTS_FOLDER="/scratch/s/steinman/macdo708/neuromorph_meshing/$SEQ/results"
 MESHING_DIR="/scratch/s/steinman/macdo708/neuromorph_meshing/$SEQ/meshing"
+CPOS_FILE="/scratch/s/steinman/macdo708/neuromorph_analysis/cpos/$SEQ.npz"
 
-# PROJ_FOLDER="/scratch/s/steinman/macdo708/surge_cfd_analysis"
-OUT_DATA_FOLDER=$PROJ_FOLDER/spectrogram_data
-OUT_IMG_FOLDER=$PROJ_FOLDER/spectrogram_imgs
+OUT_DATA_FOLDER=$PROJ_FOLDER/data/params_from_tec
+
+mkdir -p $OUT_DATA_FOLDER
 
 cd $MAIN_DIR
 
-# RESULTS_FOLDER="/scratch/s/steinman/macdo708/surge_cfd/results"
 FOLDERS=$(find "$RESULTS_FOLDER" -mindepth 1 -maxdepth 1 -type d )
-parallel -j20 python ./make_spectrograms/00_compute_spectrograms.py {} $OUT_DATA_FOLDER $OUT_IMG_FOLDER $MESHING_DIR ::: $FOLDERS
+parallel -j20 python ./make_mehdi_features/01_extract_from_tec.py {} $OUT_DATA_FOLDER $MESHING_DIR ::: $FOLDERS
 
-# python ./make_spectrograms/01_merge_spectrograms.py
-# ~/xvfb-run-safe python ./make_figures/00_make_fig.py
+python ./make_mehdi_features/02_merge_mehdi_wss_params.py $OUT_DATA_FOLDER

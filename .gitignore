@@ -1,1 +1,9 @@
 sampleData/*
+sampleData_Backup/*
+*__pycache__*
+Post/cflcalc
+Post/job_utils.pyc
+*.pyc
+Post/meshdx
+Post/wsscalc
+make_figures/*

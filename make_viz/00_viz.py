@@ -1,4 +1,6 @@
-""" Generate contour viz.
+""" Generate spectrograms using BSL tools.
+
+Note, surface meshing file is uploaded, so extracting sac from that.
 """
 
 import sys
@@ -15,39 +17,42 @@ if __name__ == "__main__":
     viz_dir = Path(sys.argv[2])
     viz_type = str(sys.argv[3])
     step = int(sys.argv[4])
-
-    cpos_d = Path('/scratch/s/steinman/macdo708/pereira_rupture_study_analysis/assets/cpos')
+    meshing_dir = Path(sys.argv[5])
+    cpos_file = Path(sys.argv[6])
 
     if not viz_dir.exists():
-        viz_dir.mkdir(exist_ok=True)
+        viz_dir.mkdir(exist_ok=True, parents=True)
 
     dd = Dataset(folder)
-    cpos_f = cpos_d / (dd.case_name + '.npz')
-    cpos_data = np.load(cpos_f)
-    mesh_file = folder.parents[1] / 'data' / (dd.case_name + '.h5')
+    case_name_short = dd.case_name.split('_cl')[0]
 
-    dd = dd.assemble_mesh().assemble_surface(mesh_file=mesh_file)
+    vtu_file = meshing_dir / case_name_short / '03_mesh' / (dd.case_name + '.vtu')
+    # cpos_file = cpos_dir / (case_name_short + '.npz')
+    cpos_data = np.load(cpos_file)
+
+    dd = dd.assemble_mesh().assemble_surface(mesh_file=vtu_file)
 
     if viz_type == 'u_mag':
         dd.viz_contour(
             array_name='u_mag', 
             contour_val=0.7, 
             output_folder=viz_dir, 
-            indices=np.arange(len(dd))[::step], # was 8
+            indices=np.arange(960)[::step], # was 8
             cpos=cpos_data['cpos'],
             parallel_scale=cpos_data['parallel_scale'],
-            window_size=[768,768],
+            # clip_surf=clip_box,
             )
 
     if viz_type == 'wss_mag':
         dd.viz_surface(
             array_name='wss_mag',
             output_folder=viz_dir,
-            indices=np.arange(len(dd))[::step], # was 8,
+            indices=np.arange(960)[::step], # was 8,
             cpos=cpos_data['cpos'],
             parallel_scale=cpos_data['parallel_scale'],
-            clim=[0.5,10],
-            window_size=[768,768],
+            clim=[1,20],
+            log_scale=True,
+            cmap='rainbow',
         )
 
     if viz_type == 'qcriterion_nd':
@@ -55,10 +60,10 @@ if __name__ == "__main__":
             array_name='qcriterion_nd', 
             contour_val=1.5, 
             output_folder=viz_dir, 
-            indices=np.arange(len(dd))[::step],
+            indices=np.arange(960)[::step],
             cpos=cpos_data['cpos'],
             parallel_scale=cpos_data['parallel_scale'],
             color=None,
             scalars='u',
-            window_size=[768,768],
+            # clip_surf=clip_box,
             )

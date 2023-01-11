@@ -182,3 +182,7 @@ if __name__ == '__main__':
 
     for i in range(file_count_npz):
         convert_xml_npz(None,None,None,u_npz_files[i],cells,num_points,redo)
+
+
+# Bullshit stuff to write down
+# sampleData/p302/results/art_p302_edited_cl_pr_I2_FC_MCA_10_Q285_Per951_Newt370_ts9600_cy2_uO1/p302_edited_cl_pr.h5

@@ -1,4 +1,6 @@
 """ Generate spectrograms using BSL tools.
+
+Note, surface meshing file is uploaded, so extracting sac from that.
 """
 
 import sys
@@ -12,31 +14,31 @@ import pyvista as pv
 from bsl.dataset import Dataset
 import numpy as np 
 
-size = 12
-plt.rc('font', size=size) #controls default text size
-plt.rc('axes', titlesize=size) #fontsize of the title
-plt.rc('axes', labelsize=size) #fontsize of the x and y labels
-plt.rc('xtick', labelsize=size) #fontsize of the x tick labels
-plt.rc('ytick', labelsize=size) #fontsize of the y tick labels
-plt.rc('legend', fontsize=size) #fontsize of the legend
-
 if __name__ == "__main__":
     folder = Path(sys.argv[1])
     spec_data_out_folder = Path(sys.argv[2])
     spec_img_out_folder = Path(sys.argv[3])
+    meshing_dir = Path(sys.argv[4])
 
     spec_out_file = spec_data_out_folder / (folder.stem + '.npz')
 
+    for ff in [spec_img_out_folder, spec_data_out_folder]:
+        if not ff.exists():
+            ff.mkdir(parents=True, exist_ok=True)
+
     if not spec_out_file.exists():
         dd = Dataset(folder)
-        case_name_short = dd.case_name.split('_mesh')[0]
+        case_name_short = dd.case_name.split('_cl')[0]
 
-        mesh_file = folder.parents[1] / 'data' / (dd.case_name + '.h5')
-        surf_file = folder.parents[1] / 'data' / (dd.case_name + '.vtp')
-
-        dd = dd.assemble_mesh().assemble_surface(mesh_file=mesh_file)
+        # meshing_dir = Path('/scratch/s/steinman/macdo708/surge_cfd/mesh/')
+        vtu_file = meshing_dir / case_name_short / '03_mesh' / (dd.case_name + '.vtu')
         
-        surf = pv.read(surf_file)
+        dd = dd.assemble_mesh().assemble_surface(mesh_file=vtu_file)
+        
+        # Surface meshing file
+        surf_dir = meshing_dir / case_name_short / '02_processed'
+        
+        surf = pv.read(surf_dir / (dd.case_name + '.vtp'))
         sac_mask = surf.point_arrays['Mask'] == 1
         sac = surf.extract_points(sac_mask, include_cells=True, adjacent_cells=True)
         sac = pv.PolyData(sac.points, faces=sac.cells)
@@ -55,32 +57,24 @@ if __name__ == "__main__":
     else:
         spec_data = np.load(spec_out_file)
 
-    bins = spec_data['bins']
-    freqs = spec_data['freqs']
-    S = spec_data['S']
+    # bins = spec_data['bins']
+    # freqs = spec_data['freqs']
+    # S = spec_data['S']
 
-    S[S < -20] = -20 
+    # S[S < -20] = -20 
 
-    # Plotting
-    fig, ax = plt.subplots(1,1, figsize=(4,4))
-    ax.pcolormesh(bins, freqs, S, shading='gouraud')
-    ax.set_xlabel('Time (s)', labelpad=-5)
-    ax.set_ylabel('Freq (Hz)', labelpad=-10)
-    ax.set_xticks([0, 0.9])
-    ax.set_xticklabels(['0.0', '0.9'])
-    ax.set_yticks([0, 500])
-    ax.set_yticklabels(['0', '500'])
+    # # Plotting
+    # plt.pcolormesh(bins, freqs, S, shading='gouraud')
+    # plt.xlabel('Time (s)')
+    # plt.ylabel('Freq (Hz)')
 
-
-    if spec_data_out_folder.parent.stem == 'standard':
-        flow_type = 'std'
-    elif spec_data_out_folder.parent.stem == 'mean_flow':
-        flow_type = 'mean'
+    # # if 'standard' in folder.stem:
+    # #     neck_type = 'std'
+    # # elif 'surge' in folder.stem:
+    # #     neck_type = 'srg'
         
-    # title = [folder.stem.split('_cl')[0], flow_type, '{:.2f}, {:.2f}'.format(S.min(), S.max())]
+    # title = [folder.stem.split('_')[1], '{:.2f}, {:.2f}'.format(S.min(), S.max())]
     # title = ', '.join(title)
-    title = folder.stem.split('_cl')[0].split('art_')[1]
 
-    ax.set_title(title)
-    plt.tight_layout
-    plt.savefig(spec_img_out_folder / (folder.stem + '.png'))#, transparent=True)
+    # plt.title(title)
+    # plt.savefig(spec_img_out_folder / (folder.stem + '.png'))
